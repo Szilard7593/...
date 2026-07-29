@@ -5,7 +5,7 @@
 #include <dirent.h>
 #include <ctype.h>
 #include <time.h>
-#include <local.h>
+#include <locale.h>
 #include <signal.h>
 
 #define MAX_PROCESSES 512
@@ -54,9 +54,28 @@ typedef struct {
 } ProcCpuSample;
 
 static ProcCpuSample prev_sample[MAX_PROCESSES];
-static int pre_sample_count = 0;
+static int prev_sample_count = 0;
 static struct timespec prev_sample_ts;
 static int have_prev_sample_ts = 0;
 
 static int find_prev_time(int pid, unsigned long* out_time) {
-	for (int i = 0
+	for (int i = 0; i< prev_sample_count; i++) {
+		if (prev_sample[i].pid == pid) {
+			*out_time = prev_sample[i].total_time;
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void init_colors();
+void draw_border();
+void draw_header();
+void draw_cpu_bar(float usage);
+void draw_mem_bar(unsigned long used, unsigned long total);
+void draw_swap_bar(unsigned long used, unsigned long total);
+void draw_uptime(long seconds);
+void draw_load_average(float load[3]);
+void draw_process_list(Process *procs, int count);
+void get_cpu_usage(SystemStats *stats);
+
