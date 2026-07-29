@@ -31,3 +31,32 @@ typedef struct {
 	float mem_percent;
 	char state;
 } Process;	
+
+typedef struct {
+	float cpu_percent;
+	unsigned long mem_total;
+	unsigned long mem_free;
+	unsigned long mem_available;
+	unsigned long swap_total;
+	unsigned long swap_free;
+	float load_avg[3];
+	long uptime_seconds;
+	Process processes[MAX_PROCESSES];
+	int process_count;
+} SystemStats;
+
+static unsigned long prev_idle = 0;
+static unsigned long prev_total = 0;
+
+typedef struct {
+	int pid;
+	unsigned long total_time;
+} ProcCpuSample;
+
+static ProcCpuSample prev_sample[MAX_PROCESSES];
+static int pre_sample_count = 0;
+static struct timespec prev_sample_ts;
+static int have_prev_sample_ts = 0;
+
+static int find_prev_time(int pid, unsigned long* out_time) {
+	for (int i = 0
